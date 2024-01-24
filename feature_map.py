@@ -17,5 +17,11 @@ class FeatureMap:
         """
         """
         for i in range(self.qubit_number):
-            qml.Displacement(vars[i], 0, wires=i)
+            qml.RY((i+1)*np.arcsin(np.mod(vars[i]+1., 2.)-1.)/2, wires=i)
+    
+    def get_cust(self, vars):
+        """
+        """
+        for i in range(self.qubit_number):
+            qml.RY((i+1)*(np.arcsin(vars[i]))/2, wires=i)
         
