@@ -1,22 +1,8 @@
-from functools import partial
 import pennylane as qml
-import numpy
 from pennylane import numpy as np
-from copy import deepcopy
 from tqdm import tqdm
 from setup import *
-
-from anatz import Ansatz
-from feature_map import FeatureMap
-
 from matplotlib import pyplot as plt
- 
-
-
-ansatz = Ansatz(qubit_number, depth)
-feature_map = FeatureMap(qubit_number)
-
-dev = qml.device('lightning.qubit', wires=qubit_number)
 
 @qml.qnode(dev, diff_method="adjoint", interface='autograd', max_diff=2)
 def circuit(x, theta):
@@ -26,17 +12,6 @@ def circuit(x, theta):
     for j in range(qubit_number-1):
         obs = obs @ qml.PauliZ(j+1)
     return qml.expval(obs)
-
-theta = np.array(np.ones(3*depth*qubit_number), requires_grad=True)
-x = np.array([np.linspace(0., 0.9, space_size)], requires_grad=True).repeat(qubit_number, axis=0).T
-adam = qml.AdamOptimizer(stepsize=0.01)
-
-exp = np.exp(-x)
-#exp = np.linspace(0., 1., space_size)
-losses = []
-
-best_loss = 1000.
-best_theta = []
 
 def cost(x, theta):
     loss = 0
@@ -50,9 +25,6 @@ def cost(x, theta):
         ode = np.abs(np.array(F(df_x, f, i)))
         ## Add Mse
         loss += 0.1*np.mean(ode ** 2)
-        ## If x = 0 add regularization
-        #if e == f_0_index:
-        #    loss += 10*np.abs(f - f_0) ** 2
         ## Add regularization term
         f_diff = f_true(i)
         loss += (1 - np.tanh(ep/float(epoch)))*np.mean(np.mean(np.abs(f - f_diff) ** 2))
@@ -62,7 +34,6 @@ def cost(x, theta):
 
     return loss
 
-index = 0
 for ep in tqdm(range(epoch)):    
         _, theta = adam.step(cost, x, theta)
             
