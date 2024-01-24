@@ -11,11 +11,11 @@ class FeatureMap:
         Product feature map
         """
         for i in range(self.qubit_number):
-            qml.RY(np.arcsin(vars[i]))
+            qml.RY(np.arcsin(vars[i])/2.)
             
     def get_map_advanced(self, vars):
         """
         """
         for i in range(self.qubit_number):
-            qml.RY((i+1) * (vars[i]), wires=i)
+            qml.Displacement(vars[i], 0, wires=i)
         
