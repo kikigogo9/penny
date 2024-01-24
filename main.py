@@ -18,7 +18,7 @@ feature_map = FeatureMap(qubit_number)
 
 dev = qml.device('lightning.qubit', wires=qubit_number)
 
-@qml.qnode(dev, diff_method="parameter-shift", interface='autograd', max_diff=2)
+@qml.qnode(dev, diff_method="adjoint", interface='autograd', max_diff=2)
 def circuit(x, theta):
     feature_map.get_map_advanced(x)
     ansatz.get_circ(theta)
@@ -29,34 +29,34 @@ def circuit(x, theta):
 
 theta = np.array(np.ones(3*depth*qubit_number), requires_grad=True)
 x = np.array([numpy.linspace(0., 1., space_size)], requires_grad=True).repeat(qubit_number, axis=0).T
-adam = qml.AdamOptimizer()
+adam = qml.AdamOptimizer(stepsize=0.01)
 
 exp = np.exp(-x)
 losses = []
 
 def cost(x, theta):
-    
-    f = circuit(x, theta)
-    
-    
-    df_x, _ = qml.grad(circuit)(x, theta) 
-    loss = np.abs(F(df_x, f, x))
-    ## Add Mse
-    loss = np.mean(loss ** 2)
-    ## If x = 0 add regularization
-    if x[0] == 0:
-        loss += 10*np.abs(f - f_0) ** 2
-    ## Add regularization term
-    loss += np.mean(np.abs(f - exp[index]) ** 2)
-    print(loss)
-    losses.append(loss)
+    loss = 0
+    for e, i in enumerate(x):
+        x_in = np.arcsin(x)
+        
+        f = circuit(x_in, theta)
+        
+        df_x, _ = qml.grad(circuit)(x_in, theta) 
+        ode = np.abs(F(df_x, f, x))
+        ## Add Mse
+        loss += np.mean(ode ** 2)
+        ## If x = 0 add regularization
+        #if x[0] == 0:
+        #    loss += 10*np.abs(f - f_0) ** 2
+        ## Add regularization term
+        loss += 5*np.mean(np.abs(f - exp[e]) ** 2)
+    print(loss._value)
+    losses.append(loss._value)
     return loss
 
 index = 0
-for _ in tqdm(range(epoch)):
-        for e, i in enumerate(x):
-            index = e 
-            _, theta = adam.step(cost, i, theta)
+for _ in tqdm(range(epoch)):    
+        _, theta = adam.step(cost, x, theta)
             
     
 #print(theta)
