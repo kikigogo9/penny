@@ -6,11 +6,11 @@ from feature_map import FeatureMap
 F = lambda df_x, f, x: df_x + l * f * (kappa + np.tan(x))
 
 qubit_number = 6
-depth = 10
+depth = 6
 epoch=250
 f_0 = 1.
 f_0_index = 0
-space_size=20
+space_size=50
 l = 20
 kappa = 0.1
 
@@ -18,7 +18,7 @@ f_true = lambda x: np.exp(-l*kappa*x)*np.cos(l*x)
 
 theta = np.array(np.ones(3*depth*qubit_number), requires_grad=True)
 x = np.array([np.linspace(0., 0.9, space_size)], requires_grad=True).repeat(qubit_number, axis=0).T
-adam = qml.AdamOptimizer(stepsize=0.01)
+adam = qml.AdamOptimizer(stepsize=0.1)
 losses = []
 
 ansatz = Ansatz(qubit_number, depth)

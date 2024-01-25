@@ -24,4 +24,9 @@ class FeatureMap:
         """
         for i in range(self.qubit_number):
             qml.RY((i+1)*(np.arcsin(vars[i]))/2, wires=i)
-        
+
+    def get_cheby(self, vars):
+        """
+        """
+        for i in range(self.qubit_number):
+            qml.RY((i + 1) * (np.arccos(vars[i])), wires=i)
