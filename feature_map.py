@@ -18,6 +18,12 @@ class FeatureMap:
         """
         for i in range(self.qubit_number):
             qml.RY((i+1)*np.arcsin(np.mod(vars[i]+1., 2.)-1.)/2, wires=i)
+
+    def get_map_chebyvanced(self, vars):
+        """
+        """
+        for i in range(self.qubit_number):
+            qml.RY(2*(i+1)*np.arccos(vars[i]), wires=i)
     
     def get_cust(self, vars):
         """

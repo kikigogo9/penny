@@ -6,7 +6,7 @@ from matplotlib import pyplot as plt
 
 @qml.qnode(dev, diff_method="adjoint", interface='autograd', max_diff=2)
 def circuit(x, theta):
-    feature_map.get_map_advanced(x)
+    feature_map.get_map_chebyvanced(x)
     ansatz.get_circ(theta)
     obs = qml.PauliZ(0)
     for j in range(qubit_number-1):
@@ -49,12 +49,16 @@ for i in x:
 out = np.array(out)
 out = out + f_0 - out[0]
 grads = np.array(grads)
-plt.plot(x, out, color='r')
 
-plt.plot(x ,grads, color='g', linestyle='dashed')
-#plt.plot(x, F(grads, out, np.mean(x)), linestyle='dashed')
-plt.plot(x, f_true(x[:,0]), color='b')
-plt.legend(("f(x)", "df(x)/dx", "ODE"))
+plt.plot(x, out, color='r', label='f(x)')
+
+plt.plot(x ,grads, color='g', linestyle='dashed', label='df(x)/dx')
+
+# plt.plot(x, F(grads, out, np.mean(x)), color='y', linestyle='dashed', label='F(x)')
+
+plt.plot(x, f_true(x[:,0]), color='b', label='ODE')
+
+plt.legend()
 plt.show()
 
 plt.plot(losses)
